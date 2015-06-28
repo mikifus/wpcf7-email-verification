@@ -36,11 +36,11 @@ define('WPCF7EV_STORAGE_TIME', 16 * HOUR_IN_SECONDS);
  * Intercept Contact Form 7 forms being sent by first verifying the senders email address.
  */
 
-function wpcf7ev_skip_sending($components) {
+function wpcf7ev_skip_sending($f) {
+    
+    $submission = WPCF7_Submission::get_instance();
+    return true; //Set $skip_mail to true
 
-    $components['send'] = false;
-
-    return $components;
 }
 
 // prettify the email addresses being sent
@@ -60,7 +60,7 @@ add_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
 function wpcf7ev_verify_email_address( $wpcf7_form )
 {
     // first prevent the emails being sent as per usual
-    add_filter('wpcf7_mail_components', 'wpcf7ev_skip_sending');
+    add_filter('wpcf7_skip_mail', 'wpcf7ev_skip_sending');
 
     // fetch the submitted form details   
     $mail_tags = $wpcf7_form->prop('mail');
@@ -104,7 +104,7 @@ add_action('wpcf7_mail_failed', 'wpcf7ev_cleanup');
 function wpcf7ev_cleanup() {
     // remove the action that triggers this plugin's code
     remove_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
-    remove_filter( 'wpcf7_mail_components', 'wpcf7ev_skip_sending' ); // allow mail to be sent as per usual
+    remove_filter( 'wpcf7_skip_mail', 'wpcf7ev_skip_sending' ); // allow mail to be sent as per usual
 }
 
 /**
