@@ -169,6 +169,7 @@ function wpcf7ev_check_verifier() {
                      '<p style="text-align:center;">Your form submission will now be processed.</p>' . 
                      '<p style="text-align:center;">If you are not redirected back to the homepage in 8 seconds, <a href="' . get_site_url() . '">click here</a>.</p>' .
                      '<script> setTimeout(function () { window.location.href = "' . get_site_url() . '"; }, 8000); </script>');
+                delete_transient($slug);
             }
         }
     }
