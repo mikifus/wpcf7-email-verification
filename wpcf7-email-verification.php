@@ -56,6 +56,12 @@ add_filter( 'wp_mail_from_name', function($from_name) {
 add_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
 
 function wpcf7ev_verify_email_address( $wpcf7_form ) {
+
+    // Check form setings and skip early if form is not set to verify emails.
+    $verify = (bool)get_post_meta( $id, 'wpcf7_verify_email', true );
+
+    if( !$verify ) return;
+
     // first prevent the emails being sent as per usual
     add_filter('wpcf7_skip_mail', 'wpcf7ev_skip_sending');
 
@@ -198,5 +204,55 @@ function wpcf7ev_cleanup_attachments() {
         closedir( $handle );
     }
 }
+
+
+/**
+ * Add new panel to the CF7 form edit screen.
+ * Add a setting to verify sender email.
+ */
+
+function wpcf7ev_admin_panel ( $panels ) {
+
+    $new_page = array(
+          'wpcf7ev-addon-settings' => array(
+                  'title' => __( 'Email verification', 'wpcf7ev' ),
+                  'callback' => 'wpcf7ev_admin_panel_content'
+          )
+    );
+
+    $panels = array_merge($panels, $new_page);
+
+    return $panels;
+
+}
+add_filter( 'wpcf7_editor_panels', 'wpcf7ev_admin_panel' );
+
+
+function wpcf7ev_admin_panel_content( $cf7 ){
+
+    $id =  $cf7->id();
+    $verify = (bool)get_post_meta( $id, 'wpcf7_verify_email', true );
+
+    ?>
+
+    <p>
+        <input type="checkbox" name="vpcf7-verify-email" id="vpcf7-verify-email" value="1" <?php echo checked( $verify ); ?> >
+        <label for="vpcf7-verify-email"><?php _e( 'Verify sender email', 'wpcf7ev' ); ?></label>
+    </p>
+
+    <?php
+
+}
+
+
+function cf7hsfi_admin_save_form( $cf7 ) {
+
+    $post_id = $cf7->id();
+
+    update_post_meta( $post_id, 'wpcf7_verify_email', (bool)$_POST['vpcf7-verify-email'] );
+
+}
+add_action( 'wpcf7_save_contact_form', 'cf7hsfi_admin_save_form' );
+
 
 ?>
