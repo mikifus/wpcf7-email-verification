@@ -13,7 +13,7 @@
 /*  Copyright 2014  Andrew Golightly  (email : andrew@golightlyplus.com)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -37,32 +37,29 @@ define('WPCF7EV_STORAGE_TIME', 16 * HOUR_IN_SECONDS);
  */
 
 function wpcf7ev_skip_sending($f) {
-    
+
     $submission = WPCF7_Submission::get_instance();
     return true; //Set $skip_mail to true
 
 }
 
 // prettify the email addresses being sent
-add_filter( 'wp_mail_from', function($email_address){
-
+add_filter( 'wp_mail_from', function($email_address) {
     return get_option('admin_email');
 }, 9);
 
-add_filter( 'wp_mail_from_name', function($from_name){
-
+add_filter( 'wp_mail_from_name', function($from_name) {
     return get_option('blogname');
 }, 9);
 
 // then request the email address to be verified and save the submission as a transient
 add_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
 
-function wpcf7ev_verify_email_address( $wpcf7_form )
-{
+function wpcf7ev_verify_email_address( $wpcf7_form ) {
     // first prevent the emails being sent as per usual
     add_filter('wpcf7_skip_mail', 'wpcf7ev_skip_sending');
 
-    // fetch the submitted form details   
+    // fetch the submitted form details
     $mail_tags = $wpcf7_form->prop('mail');
     $mail_fields = wpcf7_mail_replace_tags( $mail_tags );
     $senders_email_address = $mail_fields['sender'];
@@ -94,7 +91,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form )
     // send email to the sender with a verification link to click on
     wp_mail($senders_email_address , 'Verify your email address',
             "Hi,\n\nThanks for your your recent submission on " . get_option('blogname') .
-            ".\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n" . 
+            ".\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n" .
             get_site_url() . "/wp-admin/admin-post.php?action=wpcf7ev&email-verification-key={$random_hash}" . "\n\nThanks.");
 }
 
@@ -135,46 +132,43 @@ function wpcf7ev_check_verifier() {
     status_header(200);
     get_header();
 
-    if(isset($_GET['email-verification-key']))
-    {
+    if ( isset( $_GET['email-verification-key'] ) ) {
         $verification_key = $_GET['email-verification-key'];
 
-        if(!empty($verification_key))
-        {
-            $slug = wpcf7ev_get_slug($verification_key);
+        if( ! empty( $verification_key ) ) {
+            $slug = wpcf7ev_get_slug( $verification_key );
 
             // if the stored data is not found, send out an error message
-            if(false === ($storedValue = get_transient($slug)))
-            {
+            if(false === ( $storedValue = get_transient( $slug ) ) ) {
                 wp_mail(get_settings('admin_email'), 'Something went wrong' ,
                         'Someone attempted to verify a link for a form submission and the '.
                         "corresponding key and transient CF7 object could not be found.\n\n".
                         "The verification key used was: {$verification_key}");
-                echo('<h2>Whoops! Something went wrong.</h2>' . 
+                echo('<h2>Whoops! Something went wrong.</h2>' .
                      "<ul><li>Did you make sure you clicked on the link and not copy-and-pasted it incorrectly?</li><li>Otherwise it's most likely you took more than a few hours to click the verification link?</li></ul><p>No problem, please submit your form again.</p>");
             }
-            else
-            {
+            else {
                 $cf7_mail_fields = $storedValue[0]; // get the saved CF7 object
                 // create an array of the temp location of any attachments
-                $mail_string = trim($cf7_mail_fields['attachments']);
-                $mail_attachments = (strlen($mail_string) > 0 and !ctype_space($mail_string)) ? array_map(function($attachment) {
+                $mail_string = trim( $cf7_mail_fields['attachments'] );
+                $mail_attachments = ( strlen( $mail_string ) > 0 and !ctype_space( $mail_string ) ) ? array_map( function( $attachment ) {
                     return WPCF7EV_UPLOADS_DIR . $attachment;
-                }, explode(" ", $mail_string)) : ' ';
+                }, explode( " ", $mail_string ) ) : ' ';
                 // send out the email as per usual
                 wp_mail($cf7_mail_fields['recipient'], $cf7_mail_fields['subject'], $cf7_mail_fields['body'],'', $mail_attachments);
 
                 // display a confirmation message then redirect back to the homepage after 8 seconds
-                echo('<h2 style="text-align:center;">Thank you. Verification key accepted.</h2>' . 
-                     '<p style="text-align:center;">Your form submission will now be processed.</p>' . 
+                echo('<h2 style="text-align:center;">Thank you. Verification key accepted.</h2>' .
+                     '<p style="text-align:center;">Your form submission will now be processed.</p>' .
                      '<p style="text-align:center;">If you are not redirected back to the homepage in 8 seconds, <a href="' . get_site_url() . '">click here</a>.</p>' .
                      '<script> setTimeout(function () { window.location.href = "' . get_site_url() . '"; }, 8000); </script>');
-                delete_transient($slug);
+                delete_transient( $slug );
             }
         }
     }
 
     get_footer();
+
 }
 
 /**
