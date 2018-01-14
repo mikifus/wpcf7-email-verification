@@ -114,7 +114,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
         sprintf(
             __( "Hi,\n\nThanks for your your recent submission on %1$s\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n%2$s\n\nThanks.", 'wpcf7ev' ),
             get_option( 'blogname' ),
-            get_site_url() . "/wp-admin/admin-post.php?action=wpcf7ev&email-verification-key=".$random_hash
+            admin_url( 'admin-ajax.php?action=wpcf7ev&email-verification-key='.$random_hash )
         )
     );
 }
@@ -143,9 +143,8 @@ function wpcf7ev_get_slug( $random_hash ) {
  * the saved form submission gets sent out as per usual.
  */
 
-// creating custom handlers for my own custom GET requests.
-add_action( 'admin_post_wpcf7ev', 'wpcf7ev_check_verifier' );
-add_action( 'admin_post_nopriv_wpcf7ev', 'wpcf7ev_check_verifier' );
+add_action( 'wp_ajax_wpcf7ev', 'wpcf7ev_check_verifier' );
+add_action( 'wp_ajax_nopriv_wpcf7ev', 'wpcf7ev_check_verifier' );
 
 // check the verification key
 function wpcf7ev_check_verifier() {
@@ -204,6 +203,7 @@ function wpcf7ev_check_verifier() {
     }
 
     get_footer();
+    wp_die();
 
 }
 
