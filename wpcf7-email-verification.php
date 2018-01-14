@@ -43,16 +43,10 @@ function wpcf7ev_skip_sending($f) {
 
 }
 
-// prettify the email addresses being sent
-add_filter( 'wp_mail_from', function($email_address) {
-    return get_option('admin_email');
-}, 9);
 
-add_filter( 'wp_mail_from_name', function($from_name) {
-    return get_option('blogname');
-}, 9);
-
-// then request the email address to be verified and save the submission as a transient
+/**
+ * Request the email address to be verified and save the submission as a transient
+ */
 add_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
 
 function wpcf7ev_verify_email_address( $wpcf7_form ) {
@@ -114,7 +108,7 @@ function wpcf7ev_cleanup() {
  * Create the slug key for the transient CF7 object
  */
 
-function wpcf7ev_get_slug($random_hash) {
+function wpcf7ev_get_slug( $random_hash ) {
 
     return 'wpcf7ev_' . $random_hash;
 }
@@ -132,10 +126,10 @@ add_action( 'admin_post_nopriv_wpcf7ev', 'wpcf7ev_check_verifier' );
 // check the verification key
 function wpcf7ev_check_verifier() {
 
-    set_current_screen('wpcf7ev');
+    set_current_screen( 'wpcf7ev' );
 
     // output the header of the theme being used
-    status_header(200);
+    status_header( 200 );
     get_header();
 
     if ( isset( $_GET['email-verification-key'] ) ) {
