@@ -1,0 +1,112 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Contact Form 7 email verification\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-14 20:05+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco - https://localise.biz/\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: ..\n"
+"Language: "
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:95
+msgid "Form notice"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:97
+msgid "Hi,\n\nYou've had a form submission on %1$s from %2$s.\n\nWe are waiting for them to confirm their email address."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:113
+msgid "Verify your email address"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:115
+msgid "Hi,\n\nThanks for your your recent submission on %1$s\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n%2$s\n\nThanks."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:169
+msgid "Something went wrong"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:171
+#, php-format
+msgid ""
+"Someone attempted to verify a link for a form submission and the "
+"corresponding key and transient CF7 object could not be found. The "
+"verification key used was %s"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:176
+msgid "Whoops! Something went wrong."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:178
+msgid ""
+"Did you make sure you clicked on the link and not copy-and-pasted it "
+"incorrectly?"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:179
+msgid ""
+"Otherwise it's most likely you took more than a few hours to click the "
+"verification link?"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:181
+msgid "No problem, please submit your form again."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:196
+msgid "Thank you. Verification key accepted."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:197
+msgid "Your form submission will now be processed."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:198
+#, php-format
+msgid ""
+"If you are not redirected back to the homepage in 8 seconds, <a href=\"%s\">"
+"click here</a>."
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:248
+msgid "Email verification"
+msgstr ""
+
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:270
+msgid "Verify sender email"
+msgstr ""
+
+#. Name of the plugin
+msgid "Contact Form 7 email verification"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Extends Contact Form 7 to allow for email addresses to be verified via a "
+"link sent to the sender's email address. There is currently no settings page "
+"for this plugin."
+msgstr ""
+
+#. URI of the plugin
+msgid "http://golightlyplus.com/code/#contact-form-7-email-verification"
+msgstr ""
+
+#. Author of the plugin
+msgid "Andrew Golightly"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "http://www.golightlyplus.com"
+msgstr ""

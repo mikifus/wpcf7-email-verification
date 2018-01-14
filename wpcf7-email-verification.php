@@ -33,6 +33,20 @@ define('WPCF7EV_UPLOADS_DIR', ABSPATH . 'wp-content/uploads/wpcf7ev_files/');
 define('WPCF7EV_STORAGE_TIME', 16 * HOUR_IN_SECONDS);
 
 /**
+ * Setup plugin
+ */
+function wpcf7ev_plugin_setup() {
+
+    // Make plugin available for translation
+    // Translations can be filed in the /languages/ directory
+    load_plugin_textdomain( 'wpcf7ev', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+
+}
+add_action( 'plugins_loaded', 'wpcf7ev_plugin_setup' );
+
+
+
+/**
  * Intercept Contact Form 7 forms being sent by first verifying the senders email address.
  */
 
@@ -57,29 +71,34 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
     if( !$verify ) return;
 
     // first prevent the emails being sent as per usual
-    add_filter('wpcf7_skip_mail', 'wpcf7ev_skip_sending');
+    add_filter( 'wpcf7_skip_mail', 'wpcf7ev_skip_sending' );
 
     // fetch the submitted form details
-    $mail_tags = $wpcf7_form->prop('mail');
+    $mail_tags = $wpcf7_form->prop( 'mail' );
     $mail_fields = wpcf7_mail_replace_tags( $mail_tags );
     $senders_email_address = $mail_fields['sender'];
 
     // save any attachments to a temp directory
-    $mail_string = trim($mail_fields['attachments']);
-    if(strlen($mail_string) > 0 and !ctype_space($mail_string)) {
+    $mail_string = trim( $mail_fields['attachments'] );
+    if ( strlen ( $mail_string ) > 0 and ! ctype_space( $mail_string ) ) {
         $mail_attachments = explode(" ", $mail_string);
-        foreach($mail_attachments as $attachment) {
+        foreach ( $mail_attachments as $attachment ) {
             $uploaded_file_path = ABSPATH . 'wp-content/uploads/wpcf7_uploads/' . $attachment;
             $new_filepath = WPCF7EV_UPLOADS_DIR . $attachment;
-            rename($uploaded_file_path, $new_filepath);
+            rename( $uploaded_file_path, $new_filepath );
         }
     }
 
     // send an email to the recipient to let them know verification is pending
-    wp_mail($mail_fields['recipient'], 'Form notice',
-            "Hi,\n\nYou've had a form submission on " . get_option('blogname') . " from " .
-            $senders_email_address .
-            ".\n\nWe are waiting for them to confirm their email address.");
+    wp_mail(
+        $mail_fields['recipient'],
+        __( 'Form notice', 'wpcf7ev' ),
+        sprintf(
+            __( "Hi,\n\nYou've had a form submission on %1$s from %2$s.\n\nWe are waiting for them to confirm their email address." ),
+            get_option('blogname'),
+            $senders_email_address
+        )
+    );
 
     //create hash code for verification key
     $random_hash = substr(md5(uniqid(rand(), true)), -16, 16);
@@ -89,10 +108,15 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
     set_transient( wpcf7ev_get_slug($random_hash), $data_to_save , WPCF7EV_STORAGE_TIME );
 
     // send email to the sender with a verification link to click on
-    wp_mail($senders_email_address , 'Verify your email address',
-            "Hi,\n\nThanks for your your recent submission on " . get_option('blogname') .
-            ".\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n" .
-            get_site_url() . "/wp-admin/admin-post.php?action=wpcf7ev&email-verification-key={$random_hash}" . "\n\nThanks.");
+    wp_mail(
+        $senders_email_address,
+        __( 'Verify your email address', 'wpcf7ev' ),
+        sprintf(
+            __( "Hi,\n\nThanks for your your recent submission on %1$s\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n%2$s\n\nThanks.", 'wpcf7ev' ),
+            get_option( 'blogname' ),
+            get_site_url() . "/wp-admin/admin-post.php?action=wpcf7ev&email-verification-key=".$random_hash
+        )
+    );
 }
 
 add_action('wpcf7_mail_sent', 'wpcf7ev_cleanup');
@@ -139,13 +163,23 @@ function wpcf7ev_check_verifier() {
             $slug = wpcf7ev_get_slug( $verification_key );
 
             // if the stored data is not found, send out an error message
-            if(false === ( $storedValue = get_transient( $slug ) ) ) {
-                wp_mail(get_settings('admin_email'), 'Something went wrong' ,
-                        'Someone attempted to verify a link for a form submission and the '.
-                        "corresponding key and transient CF7 object could not be found.\n\n".
-                        "The verification key used was: {$verification_key}");
-                echo('<h2>Whoops! Something went wrong.</h2>' .
-                     "<ul><li>Did you make sure you clicked on the link and not copy-and-pasted it incorrectly?</li><li>Otherwise it's most likely you took more than a few hours to click the verification link?</li></ul><p>No problem, please submit your form again.</p>");
+            if( false === ( $storedValue = get_transient( $slug ) ) ) {
+                wp_mail(
+                    get_settings( 'admin_email' ),
+                    __( 'Something went wrong', 'wpcf7ev' ),
+                    sprintf(
+                        __( 'Someone attempted to verify a link for a form submission and the corresponding key and transient CF7 object could not be found. The verification key used was %s', 'wpcf7ev' ),
+                        $verification_key
+                    )
+                );
+                ?>
+                <h1><?php _e( 'Whoops! Something went wrong.', 'wpcf7ev' ); ?></h1>
+                <ul>
+                    <li><?php _e( 'Did you make sure you clicked on the link and not copy-and-pasted it incorrectly?', 'wpcf7ev' ); ?></li>
+                    <li><?php _e( "Otherwise it's most likely you took more than a few hours to click the verification link?", 'wpcf7ev' ); ?></li>
+                </ul>
+                <p><?php _e( 'No problem, please submit your form again.', 'wpcf7ev' ); ?></p>
+                <?php
             }
             else {
                 $cf7_mail_fields = $storedValue[0]; // get the saved CF7 object
@@ -155,13 +189,15 @@ function wpcf7ev_check_verifier() {
                     return WPCF7EV_UPLOADS_DIR . $attachment;
                 }, explode( " ", $mail_string ) ) : ' ';
                 // send out the email as per usual
-                wp_mail($cf7_mail_fields['recipient'], $cf7_mail_fields['subject'], $cf7_mail_fields['body'],'', $mail_attachments);
+                wp_mail( $cf7_mail_fields['recipient'], $cf7_mail_fields['subject'], $cf7_mail_fields['body'], '', $mail_attachments );
 
                 // display a confirmation message then redirect back to the homepage after 8 seconds
-                echo('<h2 style="text-align:center;">Thank you. Verification key accepted.</h2>' .
-                     '<p style="text-align:center;">Your form submission will now be processed.</p>' .
-                     '<p style="text-align:center;">If you are not redirected back to the homepage in 8 seconds, <a href="' . get_site_url() . '">click here</a>.</p>' .
-                     '<script> setTimeout(function () { window.location.href = "' . get_site_url() . '"; }, 8000); </script>');
+                ?>
+                <h1><?php _e( "Thank you. Verification key accepted.", 'wpcf7ev' ); ?></h1>
+                <p><?php _e( "Your form submission will now be processed.", 'wpcf7ev' ); ?></p>
+                <p><?php printf( __( 'If you are not redirected back to the homepage in 8 seconds, <a href="%s">click here</a>.', 'wpcf7ev' ), esc_url( get_site_url() ) ); ?></p>
+                <script> setTimeout(function () { window.location.href = "<?php echo esc_url( get_site_url() ); ?>"; }, 8000); </script>
+                <?php
                 delete_transient( $slug );
             }
         }
