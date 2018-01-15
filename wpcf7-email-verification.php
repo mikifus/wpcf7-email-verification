@@ -66,7 +66,7 @@ add_action( 'wpcf7_before_send_mail', 'wpcf7ev_verify_email_address' );
 function wpcf7ev_verify_email_address( $wpcf7_form ) {
 
     // Check form setings and skip early if form is not set to verify emails.
-    $verify = (bool)get_post_meta( $id, 'wpcf7_verify_email', true );
+    $verify = (bool)get_post_meta( $wpcf7_form->id(), 'wpcf7_verify_email', true );
 
     if( !$verify ) return;
 
