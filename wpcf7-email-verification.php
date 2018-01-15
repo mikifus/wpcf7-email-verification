@@ -101,7 +101,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
     );
 
     //create hash code for verification key
-    $random_hash = substr(md5(uniqid(rand(), true)), -16, 16);
+    $random_hash = substr( md5( uniqid( rand(), true ) . $senders_email_address ), -16, 16 );
 
     // save submitted form as a transient object
     $data_to_save = array($mail_fields, $random_hash);
