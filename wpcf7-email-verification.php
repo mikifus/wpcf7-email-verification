@@ -162,7 +162,8 @@ function wpcf7ev_check_verifier() {
             $slug = wpcf7ev_get_slug( $verification_key );
 
             // if the stored data is not found, send out an error message
-            if( false === ( $storedValue = get_transient( $slug ) ) ) {
+            $storedValue = get_transient( $slug );
+            if( false === $storedValue ) {
                 wp_mail(
                     get_settings( 'admin_email' ),
                     __( 'Something went wrong', 'wpcf7ev' ),
