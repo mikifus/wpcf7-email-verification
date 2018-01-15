@@ -67,6 +67,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
 
     // Check form setings and skip early if form is not set to verify emails.
     $verify = (bool)get_post_meta( $wpcf7_form->id(), 'wpcf7_verify_email', true );
+    $field = get_post_meta( $wpcf7_form->id(), 'wpcf7_verify_email_field', true );
 
     if( !$verify ) return;
 
@@ -77,6 +78,12 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
     $mail_tags = $wpcf7_form->prop( 'mail' );
     $mail_fields = wpcf7_mail_replace_tags( $mail_tags );
     $senders_email_address = $mail_fields['sender'];
+
+    $submission = WPCF7_Submission::get_instance();
+    if ( $submission && $field ) {
+        $posted_data = $submission->get_posted_data();
+        $senders_email_address = $posted_data[$field];
+    }
 
     // save any attachments to a temp directory
     $mail_string = trim( $mail_fields['attachments'] );
@@ -165,7 +172,7 @@ function wpcf7ev_check_verifier() {
             $storedValue = get_transient( $slug );
             if( false === $storedValue ) {
                 wp_mail(
-                    get_settings( 'admin_email' ),
+                    get_option( 'admin_email' ),
                     __( 'Something went wrong', 'wpcf7ev' ),
                     sprintf(
                         __( 'Someone attempted to verify a link for a form submission and the corresponding key and transient CF7 object could not be found. The verification key used was %s', 'wpcf7ev' ),
@@ -263,12 +270,18 @@ function wpcf7ev_admin_panel_content( $cf7 ){
 
     $id =  $cf7->id();
     $verify = (bool)get_post_meta( $id, 'wpcf7_verify_email', true );
+    $field = get_post_meta( $id, 'wpcf7_verify_email_field', true );
 
     ?>
 
     <p>
         <input type="checkbox" name="vpcf7-verify-email" id="vpcf7-verify-email" value="1" <?php echo checked( $verify ); ?> >
         <label for="vpcf7-verify-email"><?php _e( 'Verify sender email', 'wpcf7ev' ); ?></label>
+    </p>
+
+    <p>
+        <label for="vpcf7-verify-email-field"><?php _e( 'Email field name', 'wpcf7ev' ); ?></label>
+        <input type="text" name="vpcf7-verify-email-field" id="vpcf7-verify-email-field" value="<?php echo esc_attr( $field ); ?>" >
     </p>
 
     <?php
@@ -281,6 +294,7 @@ function cf7hsfi_admin_save_form( $cf7 ) {
     $post_id = $cf7->id();
 
     update_post_meta( $post_id, 'wpcf7_verify_email', (bool)$_POST['vpcf7-verify-email'] );
+    update_post_meta( $post_id, 'wpcf7_verify_email_field', sanitize_text_field( $_POST['vpcf7-verify-email-field'] ) );
 
 }
 add_action( 'wpcf7_save_contact_form', 'cf7hsfi_admin_save_form' );
