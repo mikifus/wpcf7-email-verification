@@ -30,7 +30,7 @@
  */
 
 define('WPCF7EV_UPLOADS_DIR', ABSPATH . 'wp-content/uploads/wpcf7ev_files/');
-define('WPCF7EV_STORAGE_TIME', 16 * HOUR_IN_SECONDS);
+define('WPCF7EV_STORAGE_TIME', 48 * HOUR_IN_SECONDS);
 
 /**
  * Setup plugin
@@ -101,7 +101,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
     );
 
     //create hash code for verification key
-    $random_hash = substr( md5( uniqid( rand(), true ) . $senders_email_address ), -16, 16 );
+    $random_hash = md5( uniqid( rand(), true ) . $senders_email_address );
 
     // save submitted form as a transient object
     $data_to_save = array($mail_fields, $random_hash);
