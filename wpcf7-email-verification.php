@@ -94,7 +94,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
         $mail_fields['recipient'],
         __( 'Form notice', 'wpcf7ev' ),
         sprintf(
-            __( "Hi,\n\nYou've had a form submission on %1$s from %2$s.\n\nWe are waiting for them to confirm their email address." ),
+            __( "Hi,\n\nYou've had a form submission on %1\$s from %2\$s.\n\nWe are waiting for them to confirm their email address." ),
             get_option('blogname'),
             $senders_email_address
         )
@@ -112,7 +112,7 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
         $senders_email_address,
         __( 'Verify your email address', 'wpcf7ev' ),
         sprintf(
-            __( "Hi,\n\nThanks for your your recent submission on %1$s\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n%2$s\n\nThanks.", 'wpcf7ev' ),
+            __( "Hi,\n\nThanks for your your recent submission on %1\$s\n\nIn order for your submission to be processed, please verify this is your email address by clicking on the following link:\n\n%2\$s\n\nThanks.", 'wpcf7ev' ),
             get_option( 'blogname' ),
             admin_url( 'admin-ajax.php?action=wpcf7ev&email-verification-key='.$random_hash )
         )
