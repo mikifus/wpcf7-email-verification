@@ -39,7 +39,7 @@ function wpcf7ev_plugin_setup() {
 
     // Make plugin available for translation
     // Translations can be filed in the /languages/ directory
-    load_plugin_textdomain( 'wpcf7ev', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+    load_plugin_textdomain( 'wpcf7ev', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 }
 add_action( 'plugins_loaded', 'wpcf7ev_plugin_setup' );

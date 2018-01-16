@@ -88,6 +88,10 @@ msgstr ""
 msgid "Verify sender email"
 msgstr ""
 
+#: ../../../../../Projects/wpcf7-email-verification/wpcf7-email-verification.php:283
+msgid "Email field name"
+msgstr ""
+
 #. Name of the plugin
 msgid "Contact Form 7 email verification"
 msgstr ""
