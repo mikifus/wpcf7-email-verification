@@ -2,15 +2,14 @@
 
 /**
  * Plugin Name: Contact Form 7 email verification
- * Plugin URI: http://golightlyplus.com/code/#contact-form-7-email-verification
+ * Plugin URI: https://github.com/mikifus/wpcf7-email-verification
  * Description: Extends Contact Form 7 to allow for email addresses to be verified via a link sent to the sender's email address. There is currently no settings page for this plugin.
- * Version: 0.55
+ * Version: 0.6
  * Author: Andrew Golightly
- * Author URI: http://www.golightlyplus.com
  * License: GPL2
  */
 
-/*  Copyright 2014  Andrew Golightly  (email : andrew@golightlyplus.com)
+/*  Copyright 2014  Andrew Golightly
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as
@@ -85,16 +84,16 @@ function wpcf7ev_verify_email_address( $wpcf7_form ) {
         $senders_email_address = $posted_data[$field];
     }
 
-    // save any attachments to a temp directory
-    $mail_string = trim( $mail_fields['attachments'] );
-    if ( strlen ( $mail_string ) > 0 and ! ctype_space( $mail_string ) ) {
-        $mail_attachments = explode(" ", $mail_string);
-        foreach ( $mail_attachments as $attachment ) {
-            $uploaded_file_path = ABSPATH . 'wp-content/uploads/wpcf7_uploads/' . $attachment;
-            $new_filepath = WPCF7EV_UPLOADS_DIR . $attachment;
-            rename( $uploaded_file_path, $new_filepath );
-        }
-    }
+//     // save any attachments to a temp directory
+//     $mail_string = trim( $mail_fields['attachments'] );
+//     if ( strlen ( $mail_string ) > 0 and ! ctype_space( $mail_string ) ) {
+//         $mail_attachments = explode(" ", $mail_string);
+//         foreach ( $mail_attachments as $attachment ) {
+//             $uploaded_file_path = ABSPATH . 'wp-content/uploads/wpcf7_uploads/' . $attachment;
+//             $new_filepath = WPCF7EV_UPLOADS_DIR . $attachment;
+//             rename( $uploaded_file_path, $new_filepath );
+//         }
+//     }
 
     // send an email to the recipient to let them know verification is pending
     wp_mail(
@@ -190,13 +189,13 @@ function wpcf7ev_check_verifier() {
             }
             else {
                 $cf7_mail_fields = $storedValue[0]; // get the saved CF7 object
-                // create an array of the temp location of any attachments
-                $mail_string = trim( $cf7_mail_fields['attachments'] );
-                $mail_attachments = ( strlen( $mail_string ) > 0 and !ctype_space( $mail_string ) ) ? array_map( function( $attachment ) {
-                    return WPCF7EV_UPLOADS_DIR . $attachment;
-                }, explode( " ", $mail_string ) ) : ' ';
+//                 // create an array of the temp location of any attachments
+//                 $mail_string = trim( $cf7_mail_fields['attachments'] );
+//                 $mail_attachments = ( strlen( $mail_string ) > 0 and !ctype_space( $mail_string ) ) ? array_map( function( $attachment ) {
+//                     return WPCF7EV_UPLOADS_DIR . $attachment;
+//                 }, explode( " ", $mail_string ) ) : ' ';
                 // send out the email as per usual
-                wp_mail( $cf7_mail_fields['recipient'], $cf7_mail_fields['subject'], $cf7_mail_fields['body'], '', $mail_attachments );
+                wp_mail( $cf7_mail_fields['recipient'], $cf7_mail_fields['subject'], $cf7_mail_fields['body'], ''/*, $mail_attachments*/ );
 
                 // display a confirmation message then redirect back to the homepage after 8 seconds
                 ?>
@@ -221,27 +220,27 @@ function wpcf7ev_check_verifier() {
 
 // this hook gets called everytime a form submission is made (verified or not)
 
-add_action( 'wpcf7_mail_sent', 'wpcf7ev_cleanup_attachments' );
-
-function wpcf7ev_cleanup_attachments() {
-
-    if ( $handle = @opendir( WPCF7EV_UPLOADS_DIR ) ) {
-
-        while ( ( $file = readdir( $handle ) ) !== false ) {
-
-            // if the current file is any of these, skip it
-            if ( $file == "." || $file == ".." || $file == ".htaccess" )
-                continue;
-
-            $file_info = stat( WPCF7EV_UPLOADS_DIR . $file );
-            if ( $file_info['mtime'] + WPCF7EV_STORAGE_TIME < time() ) {
-                @unlink( WPCF7EV_UPLOADS_DIR . $file );
-            }
-        }
-
-        closedir( $handle );
-    }
-}
+// add_action( 'wpcf7_mail_sent', 'wpcf7ev_cleanup_attachments' );
+// 
+// function wpcf7ev_cleanup_attachments() {
+// 
+//     if ( $handle = @opendir( WPCF7EV_UPLOADS_DIR ) ) {
+// 
+//         while ( ( $file = readdir( $handle ) ) !== false ) {
+// 
+//             // if the current file is any of these, skip it
+//             if ( $file == "." || $file == ".." || $file == ".htaccess" )
+//                 continue;
+// 
+//             $file_info = stat( WPCF7EV_UPLOADS_DIR . $file );
+//             if ( $file_info['mtime'] + WPCF7EV_STORAGE_TIME < time() ) {
+//                 @unlink( WPCF7EV_UPLOADS_DIR . $file );
+//             }
+//         }
+// 
+//         closedir( $handle );
+//     }
+// }
 
 
 /**
